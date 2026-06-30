@@ -1,6 +1,6 @@
 ---
 name: react-router-clean-architecture
-description: "Own React Router app-code architecture, route boundaries, UI structure, and verification for Vite-based web apps. Use when the request mentions React Router routes, loaders or actions, component boundaries, use cases, domain models, server-side data access through repository ports, design-system UI, responsive UI, charts, Playwright UI verification, or app-structure refactoring."
+description: "Own React Router app-code architecture, route boundaries, UI structure, and verification for Vite-based web apps. Use when the request mentions React Router routes, loaders or actions, component boundaries, use cases, domain models, server-side data access through repository ports, component-library UI, responsive UI, charts, Playwright UI verification, or app-structure refactoring."
 ---
 
 # React Router App Architecture
@@ -57,7 +57,7 @@ Prisma, TypeORM, raw `pg`, an HTTP backend, etc.) inside
 `app/lib/server/infrastructure/` and keep the rest of the rules unchanged.
 
 For new or unstandardized UI work, prefer a single, consistent component
-library or design system and a quiet, simple visual presentation. Keep primary
+library and a quiet, simple visual presentation. Keep primary
 labels and layouts concise, and move only supplemental, non-essential detail
 into tooltip or secondary-detail patterns.
 
@@ -71,6 +71,48 @@ process requirement.
 If a companion hosting skill explicitly overrides runtime mode or config
 bootstrap, keep these architecture and boundary rules and let the companion
 override only the hosting-specific pieces.
+
+## Canonical Layout
+
+This canonical directory layout is the most important structural rule in this
+skill. Place every file in its canonical owner and organize directories by
+responsibility, not by team preference or historical drift.
+
+```text
+app/
+  routes/
+  components/
+    <feature>/
+    shared/
+  lib/
+    client/
+      usecase/
+        <feature>/
+          use-<feature>.ts
+          state.ts
+          reducer.ts
+          selectors.ts
+          handlers.ts
+      infrastructure/
+        api/
+        browser/
+    server/
+      usecase/
+      infrastructure/
+        config/
+        repositories/
+        gateways/
+    domain/
+      entities/
+      value-objects/
+      policies/
+      services/
+      repositories/
+```
+
+The Placement Guide below maps each need to its location, and
+[`references/layout-and-module-placement.md`](references/layout-and-module-placement.md)
+covers the placement preflight, naming, and feature-boundary rules.
 
 ## Quick Start
 
@@ -90,214 +132,125 @@ override only the hosting-specific pieces.
    - persistence or external integration
    - domain rule
    - cross-boundary contract or utility
-4. Place code in the canonical layout:
-   - `app/routes/`
-   - `app/components/<feature>/`
-   - `app/components/shared/`
-   - `app/lib/client/usecase/`
-   - `app/lib/client/usecase/<feature>/use-<feature>.ts`
-   - `app/lib/client/usecase/<feature>/state.ts`
-   - `app/lib/client/usecase/<feature>/reducer.ts`
-   - `app/lib/client/usecase/<feature>/selectors.ts`
-   - `app/lib/client/usecase/<feature>/handlers.ts`
-   - `app/lib/client/infrastructure/`
-   - `app/lib/client/infrastructure/api/`
-   - `app/lib/client/infrastructure/browser/`
-   - `app/lib/server/usecase/`
-   - `app/lib/server/infrastructure/`
-   - `app/lib/server/infrastructure/config/`
-   - `app/lib/server/infrastructure/repositories/`
-   - `app/lib/server/infrastructure/gateways/`
-   - `app/lib/domain/entities/`
-   - `app/lib/domain/value-objects/`
-   - `app/lib/domain/policies/`
-   - `app/lib/domain/services/`
-   - `app/lib/domain/repositories/`
-5. Read the narrowest additional reference file after the layout reference:
-   - project bootstrap and dependency install:
-     [`references/project-bootstrap.md`](references/project-bootstrap.md)
-   - architecture overview index for multi-boundary changes:
-     [`references/layout-and-dependency-rules.md`](references/layout-and-dependency-rules.md)
-   - client layer responsibilities:
-     [`references/client-layer-responsibilities.md`](references/client-layer-responsibilities.md)
-   - server and domain layer responsibilities:
-     [`references/server-and-domain-layer-responsibilities.md`](references/server-and-domain-layer-responsibilities.md)
-   - boundary, contract, and validation rules:
-     [`references/boundary-and-contract-rules.md`](references/boundary-and-contract-rules.md)
-   - domain modeling and type rules:
-     [`references/domain-modeling-and-type-rules.md`](references/domain-modeling-and-type-rules.md)
-   - dependency injection, lifetime, and side-effect rules:
-     [`references/dependency-injection-lifetime-and-side-effects.md`](references/dependency-injection-lifetime-and-side-effects.md)
-   - FlatRoute REST API rules:
-     [`references/flat-route-rest-api-guidelines.md`](references/flat-route-rest-api-guidelines.md)
-   - state and handler composition:
-     [`references/view-state-and-handler-patterns.md`](references/view-state-and-handler-patterns.md)
-   - component file, component-library, and CSS Module rules:
-     [`references/component-file-and-css-module-rules.md`](references/component-file-and-css-module-rules.md)
-   - chart and data visualization guidance:
-     [`references/chart-and-data-visualization-guidance.md`](references/chart-and-data-visualization-guidance.md)
-   - responsive and mobile UI guidance:
-     [`references/responsive-and-mobile-ui-guidance.md`](references/responsive-and-mobile-ui-guidance.md)
-   - Playwright UI verification workflow:
-     [`references/playwright-ui-verification.md`](references/playwright-ui-verification.md)
-   - stateful flow compromise rules:
-     [`references/stateful-flow-compromises.md`](references/stateful-flow-compromises.md)
-   - hotspot refactor workflow:
-     [`references/hotspot-refactor-workflow.md`](references/hotspot-refactor-workflow.md)
-   - verification gates:
-     [`references/verification-gates.md`](references/verification-gates.md)
+4. Place code in its canonical owner from the Canonical Layout above. If a
+   file does not fit, revise the placement plan before creating a new
+   directory; the Placement Guide below maps each need to its location.
+5. Read the narrowest matching reference for the task. The References section
+   at the end of this document lists every reference grouped by topic; load
+   only the one or two that match the change instead of the whole catalog.
 
-## Non-Negotiable Rules
+## Core Rules
 
-- Keep dependency direction inward:
-  - `app/routes` and `app/components` depend on client-facing orchestration,
-    never on server infrastructure or ORM/data-client code
-  - `app/lib/client/usecase` depends on `domain` and client adapters
-  - `app/lib/server/usecase` depends on `domain` and repository ports
-  - `app/lib/server/infrastructure` implements repository ports and external
-    integrations
-  - `app/lib/domain/*` depends only on other domain modules
-- Lock file placement before coding. Name the exact target file paths first,
-  then implement.
-- Keep feature-local presentational components in `app/components/<feature>/`.
-  Use `app/components/shared/` only for feature-agnostic UI that is already
-  reused or clearly about to be reused across features.
-- Keep ORM clients, SDK clients, query builders, and direct database/network
-  access inside `app/lib/server/infrastructure/`. Server use cases and the
-  domain layer must talk to repository ports, not to concrete data clients.
-- Keep `app/components/` presentational. Allow only ephemeral UI state there,
-  such as local input focus or disclosure toggles.
-- Prefer a single, consistent component library or design system for new UI
-  work, and follow whichever standard the repository already establishes
-  unless an approved migration plan says otherwise.
-- Compose UI from the component library's documented primitives (form fields,
-  buttons, dialogs, inline message or status bars, menus, toolbars, etc.)
-  before introducing custom low-level controls, and use the library's design
-  tokens and styling solution for theme-aware visuals layered on those
-  primitives.
-- Do not mix two general-purpose component libraries in the same app. If a
-  design system is already established, follow that system and document the
-  deviation explicitly instead of layering a second component library on top.
-- Keep UI visually simple: concise labels, low-noise layouts, restrained text
-  density, and deliberate spacing over decorative complexity.
-- Use tooltip or secondary-detail affordances for supplemental, non-essential
-  detail. Do not hide required labels, key instructions, validation messages,
-  or critical status only inside a tooltip.
-- When rendering charts, choose the simplest chart that matches the task: line
-  charts for continuous trends over time, and bar or column charts for
-  comparing discrete categories or ranked values.
-- Keep charts low-noise and accessible: avoid 3D or decorative chart junk,
-  avoid color-only encoding, and keep critical values or explanations
-  discoverable without hover.
-- For important charts, provide a nearby text summary and, when exact
-  inspection matters, an accessible table or equivalent non-hover path to the
-  underlying values.
-- Build responsive UI so the same feature stays capable on both desktop and
-  mobile, using fluid layout primitives and content-driven breakpoints rather
-  than device-name-specific forks or fixed desktop widths.
-- Support narrow-screen reflow and avoid ordinary horizontal scrolling for app
-  UI. Do not lock orientation unless a single orientation is genuinely
-  essential.
-- Do not rely on hover-only or fine-pointer-only interaction for primary
-  actions, labels, or critical explanation. Keep a touch and keyboard path for
-  the same task.
-- Keep touch targets and spacing mobile-usable. Meet at least WCAG 2.2 minimum
-  target size expectations or provide equivalent spacing, and use larger
-  targets when practical.
-- One React component per `.tsx` file. The file name (`PascalCase.tsx`) and
-  the primary exported component name must match exactly. Tiny private
-  presentational helpers that have no state, no effects, and no exports may
-  stay in the same file; everything else gets its own file.
-- Default to CSS Modules for component-owned styling. Each component that
-  needs custom CSS owns a sibling `<ComponentName>.module.css` colocated with
-  the component, imported as `import styles from "./<ComponentName>.module.css";`
-  and applied through the `styles` object. Do not import non-module CSS files
-  inside components.
-- Keep media queries and other responsive styles inside the component's own
-  CSS Module (or the component library's styling solution) so style scope
-  stays bounded to the component that owns the layout.
-- Reserve global CSS for a small, named set of concerns (reset, font loading,
-  baseline body and root styles, one-time theme-provider host wiring) and
-  place it under `app/styles/`. Global stylesheets must not contain
-  feature-specific or component-name selectors, and must not override the
-  component library's internal class names.
-- Avoid inline `style={{ ... }}` for static styling. Use the component
-  library's styling solution for theme-aware visuals on its primitives and a
-  colocated CSS Module for the component's structural layout; reserve inline
-  style for genuinely dynamic runtime values.
-- For UI-affecting changes, verify the actual rendered result with Playwright
-  before considering the change done instead of relying only on code
-  inspection.
-- Prefer accessible locators and web-first assertions in Playwright, and check
-  the touched flow at the relevant route and viewport sizes.
-- Keep async state, mutation handlers, and derived view models in
-  `app/lib/client/usecase/`.
-- Co-locate `state`, `reducer`, `selector`, and `handler` modules inside the
-  owning feature directory under `app/lib/client/usecase/<feature>/`.
-- Do not create horizontal buckets such as `app/state/`, `app/reducers/`,
-  `app/stores/`, `app/handlers/`, or `app/lib/client/usecase/state/`.
-- Use FlatRoute (`@react-router/fs-routes` `flatRoutes()`) as the default
-  routing convention. One file per route module under `app/routes/`, with
-  dots in the file name mapping to URL slashes and `$segment` marking dynamic
-  parameters. Deviate only when the project already uses a different
-  convention, a third-party generator imposes one, or a specific framework
+These rules expand the five Top Priority Rules above. Each group links to the
+reference that owns the full detail; load that reference for a matching change.
+
+### Layout and dependencies
+
+- Lock file placement before coding: name exact target paths first, then
+  implement. If a file does not fit the Canonical Layout, revise the plan
+  instead of inventing a convenience directory.
+- Keep dependency direction inward: `routes`/`components` → `client/usecase` →
+  `client/infrastructure` → `domain`; `server/usecase` → `domain` + repository
+  ports; `server/infrastructure` implements those ports; `domain` depends only
+  on `domain`.
+- Keep feature-local components in `app/components/<feature>/` and promote to
+  `app/components/shared/` only when feature-agnostic. Do not add generic
+  buckets (`app/features/`, `app/hooks/`, `app/utils/`, `app/types/`,
+  `app/store/`) or horizontal `state`/`reducers`/`handlers` directories.
+- See
+  [`references/layout-and-module-placement.md`](references/layout-and-module-placement.md).
+
+### Boundaries, contracts, and dependency injection
+
+- Keep ORM/SDK/query-builder and direct database or network access inside
+  `app/lib/server/infrastructure/`; use cases and `domain` talk to repository
+  ports, not concrete clients.
+- Validate at the owning layer: transport shape in routes or API adapters,
+  application rules in use cases, business invariants in `domain`. Keep
+  transport `Request`/`Response` DTOs near their boundary and promote into
+  `domain` only when they are real business concepts.
+- Instantiate repositories and gateways in a composition root or factory, not
+  inside `domain` or use cases. Keep authorization, serialization, and side
+  effects explicit, and pass request context explicitly instead of through
+  module globals or singletons.
+- See
+  [`references/boundary-and-contract-rules.md`](references/boundary-and-contract-rules.md)
+  and
+  [`references/dependency-injection-lifetime-and-side-effects.md`](references/dependency-injection-lifetime-and-side-effects.md).
+
+### Routing and APIs
+
+- Use FlatRoute (`@react-router/fs-routes` `flatRoutes()`): one file per route
+  module under `app/routes/`, dots mapping to slashes, `$segment` for dynamic
+  params. Deviate only when the project, a generator, or a framework
   integration requires it.
-- Shape API URLs as resources, not actions: collection at `/items`, single
-  resource at `/items/$itemId`, sub-collection at `/items/$itemId/comments`.
-  Reserve verb-shaped paths (`/items/$itemId/publish`) for genuine operations
-  that do not fit CRUD, and keep them rare.
-- Keep route modules responsible for HTTP, loader/action wiring, and top-level
-  composition only.
-- Validate at the correct layer: transport shape in routes or API adapters,
-  application rules in use cases, business invariants in domain.
-- Default client-side data access to `api` adapters plus DTO mapping inside the
-  owning use case. Introduce a client-side repository abstraction only for
-  clear multi-source or local-first requirements.
-- Instantiate repositories and gateways in a composition root or dependency
-  factory, not inside domain models or use cases.
-- Prefer React Router's official Vite-powered bootstrap for new projects. Use
-  plain `create-vite` only when you intentionally choose a lower-level React
-  Router mode or must retrofit an existing starter.
-- Do not put cloud-provider provisioning, app registration, secret-store
-  policy, IaC topology, or release-infrastructure rules in this skill. Keep
-  those in a companion hosting skill while preserving these code-level
-  boundaries.
-- Do not pick the ORM, query builder, or database engine inside this skill.
-  Keep that choice in the project's data-stack decision and confine all of its
-  imports to `app/lib/server/infrastructure/`.
-- Keep authorization, serialization, migration steps, background side effects,
-  and barrel exports intentional rather than ad hoc.
-- Treat thread safety mainly as async safety and request safety: avoid
-  module-level mutable state, keep request context out of singletons, and
-  rebuild transaction-scoped dependencies per request.
-- Keep feature internals private by default and avoid circular dependencies
-  across extracted modules.
-- Use `class` only when identity, invariants, or lifecycle matter. Prefer
-  composition over inheritance, and keep DTO or transport shapes as `type` plus
-  function-based modules.
-- Use `interface` for stable object-shaped ports or contracts with multiple
-  implementations. Use `type` for DTOs, unions, mapped shapes, and local
-  view-model shapes.
-- Use `unknown` at trust boundaries when a value exists but its shape is not
-  yet proven. Narrow or parse it immediately; do not let raw `unknown` drift
-  into use cases, components, or domain models.
-- Keep one concept under one owner. Consolidate duplicate same-role modules
-  only when they represent the same concept in the same boundary.
-- Build business behavior around domain models and domain language, but do not
-  force UI state, DTOs, or infrastructure concerns into `domain`.
-- Keep constants in the narrowest owning module or feature. Extract repeated
-  stable literals into `constants.ts` only when they have one clear owner; do
-  not build a global constants dump.
-- Do not create a generic common bucket. Keep code in the narrowest owning
-  layer, and duplicate small utilities until a stable abstraction is obvious.
-- Do not create alternate top-level buckets such as `app/features/`,
-  `app/modules/`, `app/hooks/`, `app/services/`, `app/utils/`, `app/types/`, or
-  `app/store/` unless an explicit migration plan or companion skill requires
-  them.
-- If a file does not fit the canonical layout, revise the plan before
-  implementation instead of inventing a convenience directory.
-- Prefer direct replacement over compatibility aliases when renaming
-  architecture terms.
+- Shape URLs as resources (`/items`, `/items/$itemId`,
+  `/items/$itemId/comments`) and reserve rare verb paths for genuine non-CRUD
+  operations. Keep route modules limited to HTTP, loader/action wiring, and
+  top-level composition.
+- See
+  [`references/flat-route-rest-api-guidelines.md`](references/flat-route-rest-api-guidelines.md).
+
+### Client state and components
+
+- Keep async state, mutation handlers, and derived view models in
+  `app/lib/client/usecase/`, with `state`/`reducer`/`selectors`/`handlers`
+  colocated in the owning feature directory. Keep components presentational
+  with only ephemeral UI state.
+- Default client data access to `api` adapters plus DTO mapping in the owning
+  use case; add a client-side repository only for multi-source or local-first
+  needs.
+- See
+  [`references/view-state-and-handler-patterns.md`](references/view-state-and-handler-patterns.md).
+
+### Components, styling, and UI presentation
+
+- One React component per `.tsx` file with the file name matching the exported
+  component; default component-owned styling to a sibling
+  `<ComponentName>.module.css` and never import non-module CSS inside a
+  component. Avoid inline `style` for static styling, and reserve global CSS
+  under `app/styles/` for resets, fonts, baseline, and theme-host wiring.
+- Prefer one component library for new UI: compose its documented primitives
+  before custom controls, use its design tokens and styling solution for
+  theme-aware visuals, and do not mix two general-purpose libraries. Keep UI
+  visually simple and keep required labels, validation, and critical status
+  visible without hover.
+- Choose the simplest accessible chart for the task, and build responsive UI
+  that stays capable on desktop and mobile with content-driven breakpoints,
+  narrow-screen reflow, and WCAG 2.2 touch targets.
+- See
+  [`references/component-file-and-css-module-rules.md`](references/component-file-and-css-module-rules.md)
+  and
+  [`references/ui-presentation-guidance.md`](references/ui-presentation-guidance.md).
+
+### Domain modeling and types
+
+- Use `class` only when identity, invariants, or lifecycle matter; prefer
+  composition over inheritance and keep DTO or transport shapes as `type` plus
+  functions. Use `interface` for stable object ports, `type` for DTOs, unions,
+  and view models.
+- Treat untrusted data as `unknown` at the boundary and narrow it immediately.
+  Keep one concept under one owner, build behavior around `domain` without
+  forcing UI, DTO, or infrastructure concerns into it, and keep constants in
+  the narrowest owner.
+- See
+  [`references/domain-modeling-and-type-rules.md`](references/domain-modeling-and-type-rules.md).
+
+### Bootstrap and verification
+
+- Prefer React Router's official Vite-powered bootstrap; pick the data stack
+  once and confine its imports to `app/lib/server/infrastructure/`. This skill
+  does not choose the ORM, query builder, or database engine, and does not own
+  cloud provisioning, identity, secrets, IaC, or release infrastructure — leave
+  those to a companion hosting skill.
+- For UI-affecting changes, verify the rendered result with Playwright
+  (accessible locators, web-first assertions, relevant routes and viewports)
+  rather than code inspection alone.
+- See
+  [`references/project-bootstrap.md`](references/project-bootstrap.md),
+  [`references/playwright-ui-verification.md`](references/playwright-ui-verification.md),
+  and
+  [`references/verification-gates.md`](references/verification-gates.md).
 
 ## Implementation Workflow
 
@@ -526,16 +479,15 @@ override only the hosting-specific pieces.
 
 ## References
 
+Read [`references/layout-and-module-placement.md`](references/layout-and-module-placement.md)
+first, then load only the one or two references that match the change.
+
 - project bootstrap and baseline dependency install:
   [`references/project-bootstrap.md`](references/project-bootstrap.md)
-- overview index for placement and dependency rules:
-  [`references/layout-and-dependency-rules.md`](references/layout-and-dependency-rules.md)
 - layout and module placement, always read first:
   [`references/layout-and-module-placement.md`](references/layout-and-module-placement.md)
-- client layer responsibilities:
-  [`references/client-layer-responsibilities.md`](references/client-layer-responsibilities.md)
-- server and domain layer responsibilities:
-  [`references/server-and-domain-layer-responsibilities.md`](references/server-and-domain-layer-responsibilities.md)
+- client, server, and domain layer responsibilities:
+  [`references/layer-responsibilities.md`](references/layer-responsibilities.md)
 - boundary and contract rules:
   [`references/boundary-and-contract-rules.md`](references/boundary-and-contract-rules.md)
 - domain modeling and type rules:
@@ -546,10 +498,10 @@ override only the hosting-specific pieces.
   [`references/flat-route-rest-api-guidelines.md`](references/flat-route-rest-api-guidelines.md)
 - view-state and handler composition:
   [`references/view-state-and-handler-patterns.md`](references/view-state-and-handler-patterns.md)
-- chart and data visualization guidance:
-  [`references/chart-and-data-visualization-guidance.md`](references/chart-and-data-visualization-guidance.md)
-- responsive and mobile UI guidance:
-  [`references/responsive-and-mobile-ui-guidance.md`](references/responsive-and-mobile-ui-guidance.md)
+- component file, component-library, and CSS Module rules:
+  [`references/component-file-and-css-module-rules.md`](references/component-file-and-css-module-rules.md)
+- chart and responsive/mobile UI guidance:
+  [`references/ui-presentation-guidance.md`](references/ui-presentation-guidance.md)
 - Playwright UI verification workflow:
   [`references/playwright-ui-verification.md`](references/playwright-ui-verification.md)
 - stateful flow compromise rules:

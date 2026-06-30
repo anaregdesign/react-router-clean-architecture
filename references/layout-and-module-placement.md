@@ -2,40 +2,10 @@
 
 ## Canonical Layout
 
-```text
-app/
-  routes/
-  components/
-    <feature>/
-    shared/
-  lib/
-    client/
-      usecase/
-        <feature>/
-          use-<feature>.ts
-          state.ts
-          reducer.ts
-          selectors.ts
-          handlers.ts
-      infrastructure/
-        api/
-        browser/
-    server/
-      usecase/
-      infrastructure/
-        config/
-        repositories/
-        gateways/
-    domain/
-      entities/
-      value-objects/
-      policies/
-      services/
-      repositories/
-```
-
-Use these directories by responsibility, not by team preference or historical
-drift.
+The canonical directory tree is defined in the **Canonical Layout** section of
+[`SKILL.md`](../SKILL.md). Treat that tree as the single source of truth, place
+every file in its canonical owner, and organize directories by responsibility,
+not by team preference or historical drift.
 
 ## Mandatory Placement Preflight
 

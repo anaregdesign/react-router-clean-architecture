@@ -9,9 +9,8 @@ Assume this stack unless the user explicitly says otherwise:
 - TypeScript
 - React Router framework mode
 - SPA mode with `ssr: false`
-- A single component library or design system for the UI layer (the project's
-  choice; follow an existing design-system standard when the repository
-  already has one)
+- A single component library for the UI layer (the project's choice; follow an
+  existing component-library standard when the repository already has one)
 - Node.js 20.19+ or 22.x
 
 This skill does not pick the data stack. Whichever ORM, query builder, SQL
@@ -47,18 +46,18 @@ For the default stack in this skill, the baseline dependency set to line up
 early is:
 
 - Route-file support: `@react-router/fs-routes`
-- The project's chosen component library or design system, plus a matching
-  icon set, when no existing design system overrides it
+- The project's chosen component library, plus a matching icon set, when no
+  existing component library overrides it
 
 In practice, that usually means installing the route-file helper soon after
 scaffold:
 
 ```bash
 npm install @react-router/fs-routes
-# then install the component library / design system the project has chosen
+# then install the component library the project has chosen
 ```
 
-If the repository already has an established design system, use that system
+If the repository already has an established component library, use that library
 instead of adding another component library casually.
 
 Install the data stack of your choice (ORM, query builder, SDK, or HTTP
@@ -123,10 +122,10 @@ This is the cleanest match for the route-file conventions used by this skill.
 
 ### 4. Install the component library
 
-Install the component library or design system the project has chosen,
-following its own documentation. Wrap the app root with the library's theme
-provider and the appropriate theme once, at the highest sensible boundary,
-before building feature screens:
+Install the component library the project has chosen, following its own
+documentation. Wrap the app root with the library's theme provider and the
+appropriate theme once, at the highest sensible boundary, before building
+feature screens:
 
 ```tsx
 import { ThemeProvider, appTheme } from "<your-component-library>";
@@ -136,8 +135,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 }
 ```
 
-If the repository already has a clearly established design system, follow that
-system instead of mixing component libraries casually.
+If the repository already has a clearly established component library, follow
+that library instead of mixing component libraries casually.
 
 ### 5. Pick and install the data stack
 
@@ -219,7 +218,7 @@ Before starting feature work, confirm all of the following:
 - the standard mobile viewport meta tag is present
 - FlatRoute routing is wired through `app/routes.ts`
 - the chosen component library is installed and the app root is wrapped with
-  its theme provider, unless an existing design system overrides it
+  its theme provider, unless an existing component library overrides it
 - the chosen data stack is installed
 - no import of the chosen ORM, query builder, or SDK exists outside
   `app/lib/server/infrastructure/`

@@ -93,7 +93,7 @@ Do not let a component file own:
 - Respect the library's design tokens instead of hand-typed pixel values when
   the surrounding style is theme-aware.
 - Do not mix two general-purpose component libraries in the same app. If the
-  repository already has an established design system, follow that system
+  repository already has an established component library, follow that library
   instead of layering a second component library on top.
 
 ### When To Use The Library Styling Solution Versus A CSS Module
@@ -193,24 +193,9 @@ Forbidden in global stylesheets:
 
 ## Verification
 
-Use these checks alongside [`verification-gates.md`](verification-gates.md):
-
-```bash
-# One component per file: every .tsx in app/components exports exactly one
-# top-level React component whose name matches the file.
-rg -n "^export (default |const |function )" app/components
-
-# CSS Modules colocated with components: every styled component has a sibling
-# .module.css.
-find app/components -name "*.tsx" -print
-find app/components -name "*.module.css" -print
-
-# No global CSS imports inside components.
-rg -n "import .*\.css['\"]" app/components | rg -v "\.module\.css"
-
-# No inline style props except for clearly dynamic values.
-rg -n "style=\{\{" app/components
-```
-
-Treat the results as signals, not hard failures. Investigate any match, and
-either fix it or document why this component is the deliberate exception.
+The component-file and CSS Module audits — one component per file, colocated
+`<ComponentName>.module.css`, no global CSS import inside a component module,
+and no static inline `style` — live with the rest of the architecture checks in
+[`verification-gates.md`](verification-gates.md). Run them from there. Treat the
+results as signals, not hard failures: investigate any match and either fix it
+or document why this component is the deliberate exception.
