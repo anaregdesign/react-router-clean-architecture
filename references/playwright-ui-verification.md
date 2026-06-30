@@ -12,7 +12,7 @@ Run this workflow when the change touches any of the following:
 - route UI or page layout
 - component markup or styling
 - interactive flows such as forms, dialogs, popovers, or steppers
-- Tooltip or InfoLabel behavior
+- tooltip or secondary-detail affordance behavior
 - charts, tables, empty states, error states, or loading states
 - responsive layout, spacing, or typography
 
@@ -52,8 +52,8 @@ Run this workflow when the change touches any of the following:
   straight to internal DOM details.
 - When the UI includes charts or dense data displays, verify readability,
   legends, labels, and non-hover access to the key insight.
-- When the UI includes Tooltip, Popover, or InfoLabel patterns, verify both
-  hover and keyboard focus behavior.
+- When the UI includes tooltip, popover, or secondary-detail patterns, verify
+  both hover and keyboard focus behavior.
 - When the UI is mobile-sensitive, verify there is no accidental horizontal
   scrolling, clipped call to action, or hidden validation at narrow widths.
 

@@ -71,7 +71,7 @@ One component per `.tsx` file, and the file name matches the exported
 component name. Each component that needs custom CSS owns a sibling
 `<ComponentName>.module.css` colocated with the component. See
 [`component-file-and-css-module-rules.md`](component-file-and-css-module-rules.md)
-for the full set of component, Fluent UI, and CSS Module rules.
+for the full set of component, component-library, and CSS Module rules.
 
 Use `app/components/shared/` only when the component is feature-agnostic,
 reusable across features, and expressed in generic UI language instead of
@@ -170,7 +170,7 @@ For component files:
   prove to be generic enough for `app/components/shared/`
 
 See [`component-file-and-css-module-rules.md`](component-file-and-css-module-rules.md)
-for the full component, Fluent UI, and CSS Module conventions.
+for the full component, component-library, and CSS Module conventions.
 
 Inside a feature directory, short file names such as `state.ts`, `reducer.ts`,
 `selectors.ts`, `handlers.ts`, and `types.ts` are acceptable because the

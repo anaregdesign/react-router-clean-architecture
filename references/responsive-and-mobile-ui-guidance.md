@@ -52,9 +52,9 @@ through desktop without forking the product into separate architectures.
 ## Architecture Placement
 
 - Keep responsive layout behavior in component-scoped styles — the
-  component's own CSS Module or `makeStyles` block — and in presentational
-  components by default. Do not introduce global media queries for
-  feature-specific layout.
+  component's own CSS Module or the component library's styling block — and in
+  presentational components by default. Do not introduce global media queries
+  for feature-specific layout.
 - Move viewport-aware state into `app/lib/client/usecase/<feature>/` only when
   it affects interaction flow, data loading, or feature behavior rather than
   pure presentation.

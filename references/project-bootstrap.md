@@ -9,8 +9,9 @@ Assume this stack unless the user explicitly says otherwise:
 - TypeScript
 - React Router framework mode
 - SPA mode with `ssr: false`
-- Fluent UI React v9 for the UI layer unless the repository already has an
-  established design-system standard
+- A single component library or design system for the UI layer (the project's
+  choice; follow an existing design-system standard when the repository
+  already has one)
 - Node.js 20.19+ or 22.x
 
 This skill does not pick the data stack. Whichever ORM, query builder, SQL
@@ -46,17 +47,19 @@ For the default stack in this skill, the baseline dependency set to line up
 early is:
 
 - Route-file support: `@react-router/fs-routes`
-- Default UI layer when no existing design system overrides it:
-  `@fluentui/react-components`, `@fluentui/react-icons`
+- The project's chosen component library or design system, plus a matching
+  icon set, when no existing design system overrides it
 
-In practice, that usually means these commands soon after scaffold:
+In practice, that usually means installing the route-file helper soon after
+scaffold:
 
 ```bash
-npm install @react-router/fs-routes @fluentui/react-components @fluentui/react-icons
+npm install @react-router/fs-routes
+# then install the component library / design system the project has chosen
 ```
 
-If the repository already has an established design system, do not add Fluent
-UI casually just because it appears in the default list.
+If the repository already has an established design system, use that system
+instead of adding another component library casually.
 
 Install the data stack of your choice (ORM, query builder, SDK, or HTTP
 backend client) separately, following that stack's own documentation. Keep
@@ -118,25 +121,18 @@ export default flatRoutes() satisfies RouteConfig;
 
 This is the cleanest match for the route-file conventions used by this skill.
 
-### 4. Install Fluent UI React v9
+### 4. Install the component library
 
-For the default UI baseline:
-
-```bash
-npm install @fluentui/react-components @fluentui/react-icons
-```
-
-Wrap the app root with `FluentProvider` and the appropriate theme, typically
-`webLightTheme`, before building feature screens:
+Install the component library or design system the project has chosen,
+following its own documentation. Wrap the app root with the library's theme
+provider and the appropriate theme once, at the highest sensible boundary,
+before building feature screens:
 
 ```tsx
-import {
-  FluentProvider,
-  webLightTheme,
-} from "@fluentui/react-components";
+import { ThemeProvider, appTheme } from "<your-component-library>";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  return <FluentProvider theme={webLightTheme}>{children}</FluentProvider>;
+  return <ThemeProvider theme={appTheme}>{children}</ThemeProvider>;
 }
 ```
 
@@ -222,8 +218,8 @@ Before starting feature work, confirm all of the following:
 - SPA mode is enabled
 - the standard mobile viewport meta tag is present
 - FlatRoute routing is wired through `app/routes.ts`
-- Fluent UI React v9 is installed and the app root is wrapped with
-  `FluentProvider`, unless an existing design system overrides it
+- the chosen component library is installed and the app root is wrapped with
+  its theme provider, unless an existing design system overrides it
 - the chosen data stack is installed
 - no import of the chosen ORM, query builder, or SDK exists outside
   `app/lib/server/infrastructure/`

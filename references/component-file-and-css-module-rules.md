@@ -10,8 +10,8 @@ take precedence on file-shape and styling questions.
 
 - Keep each component independently readable, movable, and testable.
 - Keep style impact local to the component that owns it.
-- Keep Fluent UI as the default UI vocabulary and let CSS Modules cover the
-  remaining structural and presentational gaps.
+- Keep a single component library as the default UI vocabulary and let CSS
+  Modules cover the remaining structural and presentational gaps.
 
 ## One Component Per File
 
@@ -59,7 +59,7 @@ app/components/profile-editor/
 
 Inside `ProfileEditorForm.tsx`, keep this order:
 
-1. imports (Fluent UI, React, sibling modules, then CSS Module)
+1. imports (component library, React, sibling modules, then CSS Module)
 2. local types (`type ProfileEditorFormProps = { ... }`)
 3. the component function declaration
 4. small private sub-components or helpers, if any, that satisfy the
@@ -73,37 +73,38 @@ Do not let a component file own:
 - API calls → put them in `app/lib/client/infrastructure/api/`
 - server modules, ORM clients, or SDK clients
 
-## Fluent UI Usage
+## Component Library Usage
 
-- Default to `@fluentui/react-components` primitives (`Button`, `Field`,
-  `Input`, `Dropdown`, `Dialog`, `Toolbar`, `MessageBar`, etc.) before
+- Default to the component library's primitives (buttons, form fields, inputs,
+  dropdowns, dialogs, toolbars, message or status bars, etc.) before
   introducing custom low-level controls.
-- Use `@fluentui/react-icons` for iconography.
-- Wrap the app root in `FluentProvider` with `webLightTheme` (or the project's
-  documented theme) once, at the highest sensible boundary.
-- Prefer Fluent UI's documented composition patterns:
-  - `Field` for form rows with label, hint, and validation
-  - `MessageBar` for inline status, not custom toasts
-  - `Dialog`, `Drawer`, `Popover`, `Menu` from Fluent UI rather than custom
-    overlays
-  - `Tooltip` and `InfoLabel` only for supplemental, non-essential detail
+- Use a single, consistent icon set for iconography.
+- Wrap the app root in the component library's theme provider once, at the
+  highest sensible boundary, using the project's documented theme.
+- Prefer the component library's documented composition patterns:
+  - a form-field primitive for form rows with label, hint, and validation
+  - an inline message or status component for inline status, not custom toasts
+  - the library's dialog, drawer, popover, and menu components rather than
+    custom overlays
+  - tooltip and secondary-detail affordances only for supplemental,
+    non-essential detail
 - Keep primary labels, required-field markers, validation messages, and
   critical status visible without depending on hover.
-- Respect Fluent UI tokens (`tokens.spacingHorizontalM`, etc.) instead of
-  hand-typed pixel values when the surrounding style is theme-aware.
+- Respect the library's design tokens instead of hand-typed pixel values when
+  the surrounding style is theme-aware.
 - Do not mix two general-purpose component libraries in the same app. If the
   repository already has an established design system, follow that system
-  instead of layering Fluent UI on top.
+  instead of layering a second component library on top.
 
-### When To Use `makeStyles` Versus A CSS Module
+### When To Use The Library Styling Solution Versus A CSS Module
 
-Fluent UI ships its own atomic styling layer (`makeStyles` from
-`@fluentui/react-components`, backed by Griffel). Use it for component styles
-that need to be **theme-aware** or that override Fluent UI primitives:
+Many component libraries ship their own styling layer (a CSS-in-JS API, theme
+tokens, or a styling-hook helper). When the chosen library provides one,
+use it for component styles that need to be **theme-aware** or that override
+the library's primitives:
 
-- token-driven colors, spacing, typography (`tokens.colorNeutralForeground1`,
-  `tokens.spacingVerticalS`)
-- hover, focus, pressed, and disabled visuals layered on a Fluent UI element
+- token-driven colors, spacing, typography
+- hover, focus, pressed, and disabled visuals layered on a library primitive
 - RTL-aware logical properties (`marginInlineStart`, `paddingBlock`)
 - style variants computed from props at render time
 
@@ -115,9 +116,9 @@ Use a colocated CSS Module (`<ComponentName>.module.css`) for component-level
 - positional concerns (sticky headers, side rails, page templates)
 - decorative wrappers around charts or media
 
-Both can coexist inside one component: Fluent UI tokens via `makeStyles` for
-visuals on top of Fluent primitives, CSS Module for the surrounding layout
-scaffolding the component owns.
+Both can coexist inside one component: the library's styling solution for
+theme-aware visuals on top of its primitives, CSS Module for the surrounding
+layout scaffolding the component owns.
 
 Do **not** reach for inline `style` props for anything beyond one-off
 runtime-computed values (e.g. a dynamic width derived from measurement).
@@ -155,7 +156,7 @@ clearly labeled location such as `app/styles/`:
 - CSS reset or normalize
 - web-font loading and `@font-face` declarations
 - baseline body and root styles (background, default text rendering)
-- one-time `FluentProvider` host element wiring
+- one-time theme-provider host element wiring
 
 Anything beyond this list should be a CSS Module owned by a specific
 component or layout, not a new global rule.
@@ -164,7 +165,7 @@ Forbidden in global stylesheets:
 
 - feature-specific selectors
 - component-name selectors (e.g. `.user-menu`, `.profile-card`)
-- overrides targeting Fluent UI internal class names
+- overrides targeting the component library's internal class names
 
 ## Responsive Styles Are Component-Scoped
 
@@ -183,7 +184,7 @@ Forbidden in global stylesheets:
 - Importing a CSS file globally (`import "./styles.css"`) inside a component
   module. Component-owned styles must go through `.module.css`.
 - Inline `style={{ ... }}` for static styling that belongs in a CSS Module or
-  `makeStyles`.
+  the component library's styling solution.
 - A `.module.css` file that is not colocated with the component it styles.
 - Hidden helper components growing their own state, effects, or async logic
   while still living inside another component's file.

@@ -68,13 +68,13 @@ Confirm all of the following:
   with the file name
 - no component-owned CSS imported as a non-module stylesheet inside a
   component module; per-component styling lives in a sibling
-  `<ComponentName>.module.css` (or `makeStyles`)
+  `<ComponentName>.module.css` (or the component library's styling solution)
 - no feature-specific selectors or component-name selectors added to global
   stylesheets under `app/styles/`
 - no inline `style={{ ... }}` used for static styling that belongs in a CSS
-  Module or `makeStyles`
-- no second general-purpose component library introduced alongside Fluent UI
-  without a documented deviation
+  Module or the component library's styling solution
+- no second general-purpose component library introduced alongside the
+  project's chosen one without a documented deviation
 
 ## Useful Search Patterns
 

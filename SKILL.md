@@ -1,6 +1,6 @@
 ---
-name: react-router-app-architecture
-description: "Own React Router app-code architecture, route boundaries, UI structure, and verification for Vite-based web apps. Use when the request mentions React Router routes, loaders or actions, component boundaries, use cases, domain models, server-side data access through repository ports, Fluent UI, responsive UI, charts, Playwright UI verification, or app-structure refactoring."
+name: react-router-clean-architecture
+description: "Own React Router app-code architecture, route boundaries, UI structure, and verification for Vite-based web apps. Use when the request mentions React Router routes, loaders or actions, component boundaries, use cases, domain models, server-side data access through repository ports, design-system UI, responsive UI, charts, Playwright UI verification, or app-structure refactoring."
 ---
 
 # React Router App Architecture
@@ -30,9 +30,10 @@ This skill also does not own `/docs/spec`, `/docs/plans/plan.md`, commit-log
 workflow, branch naming workflow, or PR management; use a repository workflow
 skill for those concerns and keep this skill focused on app code.
 
-For new or unstandardized UI work, prefer Fluent UI React v9 and a quiet,
-simple visual presentation. Keep primary labels and layouts concise, and move
-only supplemental, non-essential detail into Tooltip or InfoLabel patterns.
+For new or unstandardized UI work, prefer a single, consistent component
+library or design system and a quiet, simple visual presentation. Keep primary
+labels and layouts concise, and move only supplemental, non-essential detail
+into tooltip or secondary-detail patterns.
 
 When data visualization is required, prefer the simplest accessible chart that
 matches the analytical task and keep chart interaction lightweight.
@@ -105,7 +106,7 @@ override only the hosting-specific pieces.
      [`references/flat-route-rest-api-guidelines.md`](references/flat-route-rest-api-guidelines.md)
    - state and handler composition:
      [`references/view-state-and-handler-patterns.md`](references/view-state-and-handler-patterns.md)
-   - component file, Fluent UI, and CSS Module rules:
+   - component file, component-library, and CSS Module rules:
      [`references/component-file-and-css-module-rules.md`](references/component-file-and-css-module-rules.md)
    - chart and data visualization guidance:
      [`references/chart-and-data-visualization-guidance.md`](references/chart-and-data-visualization-guidance.md)
@@ -140,21 +141,22 @@ override only the hosting-specific pieces.
   domain layer must talk to repository ports, not to concrete data clients.
 - Keep `app/components/` presentational. Allow only ephemeral UI state there,
   such as local input focus or disclosure toggles.
-- Prefer Fluent UI React v9 (`@fluentui/react-components`) for new UI work
-  unless the repository already has a clear design-system standard or an
-  approved migration plan says otherwise.
-- Compose UI from documented Fluent UI primitives (`Field`, `Button`,
-  `Dialog`, `MessageBar`, `Menu`, `Toolbar`, etc.) before introducing custom
-  low-level controls, and use Fluent UI tokens through `makeStyles` for
-  theme-aware visuals layered on those primitives.
+- Prefer a single, consistent component library or design system for new UI
+  work, and follow whichever standard the repository already establishes
+  unless an approved migration plan says otherwise.
+- Compose UI from the component library's documented primitives (form fields,
+  buttons, dialogs, inline message or status bars, menus, toolbars, etc.)
+  before introducing custom low-level controls, and use the library's design
+  tokens and styling solution for theme-aware visuals layered on those
+  primitives.
 - Do not mix two general-purpose component libraries in the same app. If a
   design system is already established, follow that system and document the
-  deviation explicitly instead of layering Fluent UI on top.
+  deviation explicitly instead of layering a second component library on top.
 - Keep UI visually simple: concise labels, low-noise layouts, restrained text
   density, and deliberate spacing over decorative complexity.
-- Use Tooltip or InfoLabel for supplemental, non-essential detail. Do not hide
-  required labels, key instructions, validation messages, or critical status
-  only inside a Tooltip.
+- Use tooltip or secondary-detail affordances for supplemental, non-essential
+  detail. Do not hide required labels, key instructions, validation messages,
+  or critical status only inside a tooltip.
 - When rendering charts, choose the simplest chart that matches the task: line
   charts for continuous trends over time, and bar or column charts for
   comparing discrete categories or ranked values.
@@ -186,17 +188,17 @@ override only the hosting-specific pieces.
   and applied through the `styles` object. Do not import non-module CSS files
   inside components.
 - Keep media queries and other responsive styles inside the component's own
-  CSS Module (or `makeStyles`) so style scope stays bounded to the component
-  that owns the layout.
+  CSS Module (or the component library's styling solution) so style scope
+  stays bounded to the component that owns the layout.
 - Reserve global CSS for a small, named set of concerns (reset, font loading,
-  baseline body and root styles, one-time `FluentProvider` host wiring) and
+  baseline body and root styles, one-time theme-provider host wiring) and
   place it under `app/styles/`. Global stylesheets must not contain
-  feature-specific or component-name selectors, and must not override Fluent
-  UI internal class names.
-- Avoid inline `style={{ ... }}` for static styling. Use `makeStyles` for
-  theme-aware visuals on Fluent UI primitives and a colocated CSS Module for
-  the component's structural layout; reserve inline style for genuinely
-  dynamic runtime values.
+  feature-specific or component-name selectors, and must not override the
+  component library's internal class names.
+- Avoid inline `style={{ ... }}` for static styling. Use the component
+  library's styling solution for theme-aware visuals on its primitives and a
+  colocated CSS Module for the component's structural layout; reserve inline
+  style for genuinely dynamic runtime values.
 - For UI-affecting changes, verify the actual rendered result with Playwright
   before pushing instead of relying only on code inspection.
 - Prefer accessible locators and web-first assertions in Playwright, and check
@@ -303,8 +305,8 @@ override only the hosting-specific pieces.
   use-case code. Use FlatRoute (`flatRoutes()`) as the routing convention from
   the first route file so URL shape, dynamic segments, and index modules stay
   consistent across the app.
-- Add Fluent UI React v9 early for new UI work so components, theming, and
-  accessibility patterns stay consistent from the first screen.
+- Add the chosen component library early for new UI work so components,
+  theming, and accessibility patterns stay consistent from the first screen.
 - Pick the data stack (ORM, query builder, or remote backend client) once,
   document it in the project, and keep its imports confined to
   `app/lib/server/infrastructure/`. This skill is intentionally silent on
@@ -350,11 +352,11 @@ override only the hosting-specific pieces.
 - Keep feature-specific presentational components in
   `app/components/<feature>/` by default. Promote a component to
   `app/components/shared/` only after it proves to be truly feature-agnostic.
-- Prefer composing views from Fluent UI primitives before introducing custom
-  low-level controls.
-- Keep on-screen copy terse. Put optional elaboration behind Tooltip,
-  InfoLabel, Popover, or a similar secondary affordance only when the extra
-  detail is not required for task completion.
+- Prefer composing views from the component library's primitives before
+  introducing custom low-level controls.
+- Keep on-screen copy terse. Put optional elaboration behind a tooltip,
+  popover, or similar secondary affordance only when the extra detail is not
+  required for task completion.
 - Keep purely presentational responsive adaptation in CSS, layout primitives,
   and presentational components. Move breakpoint-aware state into `usecase`
   only when it changes interaction flow or data loading behavior.
@@ -466,8 +468,8 @@ override only the hosting-specific pieces.
 ## Placement Guide
 
 - Need feature-local pure rendering and markup: `app/components/<feature>/`
-- Need reusable pure UI primitives or shared Fluent UI composition wrappers:
-  `app/components/shared/`
+- Need reusable pure UI primitives or shared component-library composition
+  wrappers: `app/components/shared/`
 - Need route composition or loader/action bridging: `app/routes/`
 - Need client-side state, handlers, reducers, selectors, or orchestration:
   `app/lib/client/usecase/<feature>/`

@@ -65,18 +65,19 @@ Apply these rules to every component file, in addition to the contract above:
   the primary exported component name match exactly.
 - Co-define the component's `Props` type in the same file as
   `type <ComponentName>Props = { ... }`.
-- Default to Fluent UI React v9 primitives; use `makeStyles` with Fluent UI
-  tokens for theme-aware visuals layered on those primitives.
+- Default to the project's component-library primitives; use the library's
+  styling solution and design tokens for theme-aware visuals layered on those
+  primitives.
 - Default to a sibling `<ComponentName>.module.css` for component-owned
   structural styling, imported as
   `import styles from "./<ComponentName>.module.css";`. Do not import
   non-module CSS files inside a component.
 - Reserve global CSS for resets, font loading, baseline body styles, and the
-  one-time `FluentProvider` host wiring under `app/styles/`.
+  one-time theme-provider host wiring under `app/styles/`.
 
 See
 [`component-file-and-css-module-rules.md`](component-file-and-css-module-rules.md)
-for the full set of file-shape, Fluent UI, and CSS Module conventions,
+for the full set of file-shape, component-library, and CSS Module conventions,
 including the narrow exception for tiny private sub-components.
 
 ## Action Granularity
