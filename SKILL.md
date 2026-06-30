@@ -5,6 +5,36 @@ description: "Own React Router app-code architecture, route boundaries, UI struc
 
 # React Router App Architecture
 
+## Top Priority Rules (Non-Negotiable)
+
+**These five rules are the most important in this skill. They are absolute,
+take precedence over convenience, speed, or any other guidance here, and must
+never be violated.**
+
+1. **Route with FlatRoute.** Use FlatRoute
+   (`@react-router/fs-routes` `flatRoutes()`) as the routing convention: one
+   file per route module under `app/routes/`, with dots in the file name
+   mapping to URL slashes and `$segment` marking dynamic parameters.
+2. **One React component per file.** Each `.tsx` file exports exactly one
+   React component, and the file name (`PascalCase.tsx`) matches the exported
+   component name exactly.
+3. **One CSS Module per component.** Every component that needs custom CSS owns
+   exactly one sibling `<ComponentName>.module.css`, imported as
+   `import styles from "./<ComponentName>.module.css";` and applied through the
+   `styles` object. Never import non-module CSS inside a component.
+4. **Obey the canonical layout and dependency direction.** Place every file in
+   its canonical owner, and keep dependencies pointing strictly inward:
+   `routes`/`components` → client orchestration → `domain`; `server/usecase` →
+   `domain` + repository ports; `server/infrastructure` implements those ports.
+   Dependencies must never point outward.
+5. **Never exceed a layer's responsibility.** Keep every layer strictly within
+   its role — components render, use cases orchestrate, domain holds business
+   rules, infrastructure talks to the outside world. Never implement anything
+   that belongs to another layer.
+
+The detailed rules in the rest of this document expand on these five. Whenever
+any guidance appears to conflict, these five always win.
+
 ## Overview
 
 Use this skill as the default architecture workflow for a React Router SPA that
