@@ -2,8 +2,8 @@
 
 ## Goal
 
-Check the real rendered UI before pushing when a change affects presentation,
-interaction, or responsive behavior.
+Check the real rendered UI before considering a change done when it affects
+presentation, interaction, or responsive behavior.
 
 ## When To Use It
 

@@ -1,6 +1,6 @@
 # Verification Gates
 
-## Use This Before Push
+## Verification Order
 
 Run verification in this order:
 
@@ -11,11 +11,10 @@ Run verification in this order:
 5. Playwright check of the touched route when UI is affected, including mobile
    viewport verification when layout or interaction is responsive
 6. Manual spot check of the touched flow
-7. Commit history sanity check when preparing shared commits
 
-Do not push code that passes tests but breaks layer direction.
-Do not push UI-affecting changes that were never checked in a real rendered
-browser flow.
+Code that passes tests but breaks layer direction is not done.
+UI-affecting changes that were never checked in a real rendered browser flow
+are not done.
 
 ## Architecture Drift Checklist
 
@@ -127,9 +126,9 @@ rg -n "@prisma/client" app   # adapt the package name to the chosen stack
 Interpret results, do not blindly fail on matches. The point is to surface
 suspicious files quickly.
 
-## Push Gate Heuristic
+## Completion Gate Heuristic
 
-Before `git push`, be able to state all of the following:
+Before considering the change complete, be able to state all of the following:
 
 - the use case layer owns the interaction logic
 - the view layer is mostly props plus rendering
@@ -170,4 +169,5 @@ Before `git push`, be able to state all of the following:
 - UI-affecting changes were checked in Playwright at the relevant route,
   viewport sizes, and orientation when needed
 
-If any statement is false, fix the architecture before pushing.
+If any statement is false, fix the architecture before considering the change
+done.

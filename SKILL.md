@@ -26,10 +26,6 @@ database engine. Plug in the data stack that fits the project (Drizzle, Kysely,
 Prisma, TypeORM, raw `pg`, an HTTP backend, etc.) inside
 `app/lib/server/infrastructure/` and keep the rest of the rules unchanged.
 
-This skill also does not own `/docs/spec`, `/docs/plans/plan.md`, commit-log
-workflow, branch naming workflow, or PR management; use a repository workflow
-skill for those concerns and keep this skill focused on app code.
-
 For new or unstandardized UI work, prefer a single, consistent component
 library or design system and a quiet, simple visual presentation. Keep primary
 labels and layouts concise, and move only supplemental, non-essential detail
@@ -118,7 +114,7 @@ override only the hosting-specific pieces.
      [`references/stateful-flow-compromises.md`](references/stateful-flow-compromises.md)
    - hotspot refactor workflow:
      [`references/hotspot-refactor-workflow.md`](references/hotspot-refactor-workflow.md)
-   - verification before push:
+   - verification gates:
      [`references/verification-gates.md`](references/verification-gates.md)
 
 ## Non-Negotiable Rules
@@ -200,7 +196,8 @@ override only the hosting-specific pieces.
   colocated CSS Module for the component's structural layout; reserve inline
   style for genuinely dynamic runtime values.
 - For UI-affecting changes, verify the actual rendered result with Playwright
-  before pushing instead of relying only on code inspection.
+  before considering the change done instead of relying only on code
+  inspection.
 - Prefer accessible locators and web-first assertions in Playwright, and check
   the touched flow at the relevant route and viewport sizes.
 - Keep async state, mutation handlers, and derived view models in
@@ -443,14 +440,15 @@ override only the hosting-specific pieces.
 - Use barrel exports sparingly and only when they do not obscure ownership or
   create cycles.
 
-### 11. Verify before push
+### 11. Verify before completing the change
 
 - Run targeted tests for the touched area.
 - Run typecheck and lint or the project quality gate.
 - Audit for boundary drift and forbidden imports.
 - For UI-affecting changes, run the touched route in Playwright and confirm the
   rendered result, interaction states, and responsive layout.
-- Fix architecture violations before pushing even if tests pass.
+- Fix architecture violations before considering the change done even if tests
+  pass.
 
 ### 12. Refactor overloaded files in phases
 
@@ -528,5 +526,5 @@ override only the hosting-specific pieces.
   [`references/stateful-flow-compromises.md`](references/stateful-flow-compromises.md)
 - hotspot refactor workflow:
   [`references/hotspot-refactor-workflow.md`](references/hotspot-refactor-workflow.md)
-- verification before push:
+- verification gates:
   [`references/verification-gates.md`](references/verification-gates.md)
