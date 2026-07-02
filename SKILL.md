@@ -93,6 +93,7 @@ app/
           reducer.ts
           selectors.ts
           handlers.ts
+          types.ts
       infrastructure/
         api/
         browser/
@@ -187,7 +188,7 @@ reference that owns the full detail; load that reference for a matching change.
 - Shape URLs as resources (`/items`, `/items/$itemId`,
   `/items/$itemId/comments`) and reserve rare verb paths for genuine non-CRUD
   operations. Keep route modules limited to HTTP, loader/action wiring, and
-  top-level composition.
+  top-level composition, typed with the generated `./+types` route types.
 - See
   [`references/flat-route-rest-api-guidelines.md`](references/flat-route-rest-api-guidelines.md).
 
@@ -281,8 +282,11 @@ reference that owns the full detail; load that reference for a matching change.
   writing features.
 - Prefer `create-react-router` for this skill's architecture because it
   already aligns with Vite, route modules, and SPA mode.
-- Add `@react-router/fs-routes` and SPA configuration before layering domain or
-  use-case code. Use FlatRoute (`flatRoutes()`) as the routing convention from
+- Add `@react-router/fs-routes` and the runtime-mode configuration before
+  layering domain or use-case code. Choose the mode deliberately: `ssr: false`
+  fits an external-backend SPA, while the app's own loaders, actions, and
+  `app/lib/server/*` layers require the server runtime.
+  Use FlatRoute (`flatRoutes()`) as the routing convention from
   the first route file so URL shape, dynamic segments, and index modules stay
   consistent across the app.
 - Add the chosen component library early for new UI work so components,
@@ -356,6 +360,8 @@ reference that owns the full detail; load that reference for a matching change.
 
 - Use loader data for route reads.
 - Use action or fetcher state for mutations.
+- In SPA mode (`ssr: false`), use the `clientLoader` and `clientAction`
+  equivalents; server `loader`/`action` code requires the server runtime.
 - Use navigation or fetcher pending state instead of duplicating network flags
   in component state.
 - Add client state only for interaction state that is not already owned by the

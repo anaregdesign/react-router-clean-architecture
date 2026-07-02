@@ -8,10 +8,12 @@ Assume this stack unless the user explicitly says otherwise:
 
 - TypeScript
 - React Router framework mode
-- SPA mode with `ssr: false`
+- SPA mode with `ssr: false` when runtime data comes from an external HTTP
+  backend; the server runtime (`ssr: true`) when the app's own loaders,
+  actions, and `app/lib/server/*` layers are the backend (see step 2 below)
 - A single component library for the UI layer (the project's choice; follow an
   existing component-library standard when the repository already has one)
-- Node.js 20.19+ or 22.x
+- Node.js 22.12+ or 24.x (Node 20 reached end of life in April 2026)
 
 This skill does not pick the data stack. Whichever ORM, query builder, SQL
 client, or remote backend you choose, confine its imports to
@@ -73,7 +75,7 @@ npx create-react-router@latest my-app
 cd my-app
 ```
 
-Use the TypeScript option when prompted.
+The default template is TypeScript; keep it.
 
 Keep the standard mobile viewport tag in the document head:
 
@@ -84,9 +86,22 @@ Keep the standard mobile viewport tag in the document head:
 Add `viewport-fit=cover` only when the layout intentionally handles safe-area
 insets.
 
-### 2. Switch the app to SPA mode by default
+### 2. Choose the runtime mode deliberately
 
-Create or update `react-router.config.ts`:
+Route `loader`/`action` handlers and the `app/lib/server/*` layers only run
+when the app is deployed with the React Router server runtime. Pick the mode
+that matches where the app's runtime data comes from:
+
+- SPA mode (`ssr: false`): the build is static assets plus an external HTTP
+  backend. Route modules use `clientLoader`/`clientAction` for runtime data,
+  `client/infrastructure/api` calls the external backend, and server
+  `loader`/`action` code runs only at build time for prerendered paths.
+- Server runtime (`ssr: true`): required when this skill's `server/usecase`
+  and `server/infrastructure` layers implement the app's own backend — route
+  `loader`/`action` handlers, `/api/*` resource routes, and repository
+  implementations backed by a database.
+
+For SPA mode, create or update `react-router.config.ts`:
 
 ```ts
 import type { Config } from "@react-router/dev/config";
@@ -214,9 +229,12 @@ is React Router framework mode.
 Before starting feature work, confirm all of the following:
 
 - `npm run dev` starts successfully
-- SPA mode is enabled
+- the runtime mode matches the data source: `ssr: false` only when runtime
+  data comes from an external backend, the server runtime when route
+  `loader`/`action` or `app/lib/server/*` code must run
 - the standard mobile viewport meta tag is present
 - FlatRoute routing is wired through `app/routes.ts`
+- `npm run typecheck` passes (route type generation plus `tsc`)
 - the chosen component library is installed and the app root is wrapped with
   its theme provider, unless an existing component library overrides it
 - the chosen data stack is installed

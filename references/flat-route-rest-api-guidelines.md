@@ -28,6 +28,15 @@ Prefer the alternative folder-based or convention-based routing only when:
 - a third-party generator imposes it
 - a specific framework integration requires it
 
+## Runtime Requirement
+
+`loader` and `action` handlers — including every `/api/*` route in this guide
+— run only when the app is deployed with the React Router server runtime
+(`ssr: true`). In SPA mode (`ssr: false`) they are unavailable at runtime:
+use `clientLoader`/`clientAction` inside route modules and reach the external
+backend through `app/lib/client/infrastructure/api/` instead. See
+[`project-bootstrap.md`](project-bootstrap.md) for choosing the runtime mode.
+
 ## REST URL Mapping
 
 Prefer URLs that read like resources, not actions.
@@ -50,6 +59,8 @@ A route module should be responsible for:
 - selecting the correct use case
 - mapping use-case results into a response
 - returning typed loader data when applicable
+- rendering route-level error UI through an exported `ErrorBoundary` when the
+  route owns error presentation
 
 A route module should not contain:
 
@@ -57,6 +68,27 @@ A route module should not contain:
 - direct data-client queries
 - multi-step orchestration that belongs to a use case
 - shared transport DTOs for other features
+
+## Route Type Safety
+
+Type loaders, actions, and route components with the generated route types
+instead of hand-written argument or data types:
+
+```ts
+import type { Route } from "./+types/items.$itemId";
+
+export async function loader({ params }: Route.LoaderArgs) {
+  // ...
+}
+
+export default function ItemDetail({ loaderData }: Route.ComponentProps) {
+  // ...
+}
+```
+
+Type generation runs automatically with `react-router dev`; keep the
+project's `typecheck` script running `react-router typegen && tsc` so CI and
+editors see the same types.
 
 ## Method And Handler Mapping
 
@@ -86,6 +118,20 @@ Prefer:
 Avoid separate files such as `items.get.tsx`, `items.post.tsx`, or
 `items.delete.tsx`. Method dispatch belongs inside the route module.
 
+## Nesting And Index Caveat
+
+Dots create layout nesting as well as URL segments:
+
+- `items.tsx` becomes the parent layout of `items.$itemId.tsx`, so the child
+  renders inside the parent's `<Outlet />`.
+- When `items.tsx` acts as a section layout, put the collection page in
+  `items._index.tsx`.
+- Use a trailing underscore (`items_.$itemId.tsx`) when the detail page must
+  not nest inside the collection layout.
+
+Resource routes without a component are unaffected: a request to
+`/api/items/123` invokes only the matching leaf module's loader or action.
+
 ## Internal API Path Rule
 
 When the same resource needs an internal JSON API for the SPA client, prefer
@@ -94,7 +140,10 @@ prefixing it with `api`.
 Use this convention:
 
 - UI page: `app/routes/items.tsx` for `/items`
-- internal JSON: `app/routes/api.items.tsx` for `/api/items`
+- internal JSON: `app/routes/api.items.ts` for `/api/items`
+
+A JSON-only route is a resource route: it exports a loader or action but no
+component, so it stays a `.ts` file.
 
 Keep both routes thin and let them share the same use case from
 `app/lib/server/usecase/`.
@@ -131,4 +180,6 @@ Use these defaults:
 - `409 Conflict` for state conflicts such as version mismatches
 
 Map domain or use-case errors to these codes at the route boundary, not inside
-the use case itself.
+the use case itself. In UI routes, `throw` a `Response` (for example a 404)
+from the loader and render it in the nearest exported `ErrorBoundary`; return
+status responses with JSON bodies from `/api/*` resource routes.

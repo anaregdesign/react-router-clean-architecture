@@ -93,7 +93,7 @@ rg -n "Request|Response|Payload|Dto|DTO" app/lib/domain
 rg -n "new .*Repository|new .*Gateway" app/lib/domain app/lib/server/usecase
 rg -n "let current|let active|let request|let user|let tenant|globalThis\.|module\.exports\." app/lib/server
 madge --circular app 2>/dev/null || true
-rg -n "index\.ts$" app
+rg --files app | rg "/index\.ts$"
 rg --files app | rg "/(helpers|utils|common|misc|temp|new)\.(ts|tsx)$"
 rg -n "useEffect\(" app/components
 

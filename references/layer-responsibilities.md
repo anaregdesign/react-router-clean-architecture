@@ -119,6 +119,11 @@ repository abstraction.
 
 ## Server And Domain Layers
 
+The `server/*` layers below execute only when the app runs with the React
+Router server runtime (`ssr: true`). In SPA mode (`ssr: false`) they are not
+part of the runtime deployment; the client consumes an external backend
+through `client/infrastructure/api` instead.
+
 ### `app/lib/domain/entities/`
 
 - Hold business concepts that enforce invariants or domain behavior.
